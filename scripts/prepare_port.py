@@ -179,6 +179,14 @@ def prepare(engine, donor_root, target_root, config, report_dir):
     if int(target_vendor["ro.build.version.sdk"]) != tp["platform_sdk"]:
         raise RuntimeError("Target base is not the pinned Android 14 stack")
     generated, info = source_config(donor_root, dp["model"], dp["region"])
+    # The retained HIDL/32-bit-runtime compatibility blobs are AOSP-build-specific.
+    # Do not silently mix a different A54 build with Fold8 CP2A prebuilts.
+    donor_id = donor_props.get("ro.build.id", "")
+    if donor_id != "CP2A.260605.016":
+        raise RuntimeError(
+            f"Donor AOSP build {donor_id!r} differs from the pinned CP2A.260605.016 "
+            "HIDL/32-bit runtime prebuilts. Regenerate and audit those blobs before building.")
+    info["aosp_build_id"] = donor_id
     # The target remains qssi, so gen_config_file.sh reads qssi.sh even when
     # the donor SSI is essi. Keep the inspected source SSI in that profile.
     (engine / "unica/configs/qssi.sh").write_text(generated)

@@ -95,8 +95,9 @@ cgroup, performance and kernel-5.4 compatibility work is retained subject to its
 own content checks. Patch failures and skipped hunks are retained in reports.
 
 The engine's 32-bit runtime/HIDL compatibility prebuilts are tied to an AOSP build
-ID. They must match the inspected A54 build or be regenerated before claiming a
-working port; a successful assembly alone does not prove ABI compatibility.
+ID. The profile now fails closed unless the inspected A54 AOSP build ID is
+`CP2A.260605.016`; a different build requires regenerating and auditing those blobs
+before assembly. Even a matching ID is not a hardware/ABI validation result.
 
 ## GitHub Actions
 

@@ -22,6 +22,7 @@ on:
     paths:
       - '.github/workflows/build.yml'
       - 'scripts/build.sh'
+      - 'scripts/prepare_port.py'
 
 permissions:
   contents: read
