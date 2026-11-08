@@ -99,6 +99,26 @@ jobs:
       - name: Audit assembled vendor before accepting artifact
         if: env.STAGE == 'build'
         run: python3 scripts/audit_firmware.py --engine .work/engine --workdir --reports reports
+      - name: Surface pipeline failure in the check annotations
+        if: failure()
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          p = pathlib.Path('reports/pipeline.log')
+          text = p.read_text(errors='replace')[-5000:] if p.exists() else 'Pipeline failed before its log was created; inspect the failed step.'
+          text = text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+          print('::error title=Port pipeline failure::' + text)
+          PY
+      - name: Surface pipeline failure in the check annotations
+        if: failure()
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          p = pathlib.Path('reports/pipeline.log')
+          text = p.read_text(errors='replace')[-5000:] if p.exists() else 'Pipeline failed before its log was created; inspect the failed step.'
+          text = text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+          print('::error title=Port pipeline failure::' + text)
+          PY
       - name: Summarize actual result (never infer a successful boot)
         if: always()
         run: |

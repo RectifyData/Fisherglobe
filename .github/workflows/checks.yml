@@ -1,0 +1,38 @@
+name: Pipeline checks
+on:
+  push:
+    branches: [arena/dfcc4d72-fisherglobe]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.11'
+      - name: Python and shell syntax
+        run: |
+          python3 -m py_compile scripts/*.py
+          bash -n scripts/*.sh overlays/a54/customize.sh
+      - name: Dependency-free unit tests
+        run: python3 -m unittest discover -s tests -v
+      - name: Validate workflow syntax and action pins
+        run: |
+          python3 -m pip install PyYAML==6.0.3
+          python3 - <<'PY'
+          import json, pathlib, re, yaml
+          locks = json.load(open('config/locks.json'))['actions']
+          for p in pathlib.Path('.github/workflows').glob('*.yml'):
+              text = p.read_text()
+              d = yaml.safe_load(text)
+              assert 'jobs' in d and ('on' in d or True in d), p
+              for action, sha in re.findall(r'uses:\s*([^@\s]+)@(\w+)', text):
+                  assert re.fullmatch('[0-9a-f]{40}', sha), (p, action)
+                  assert sha in locks.values(), (p, action, sha)
+          print('Workflow YAML and full action pins verified')
+          PY
