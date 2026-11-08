@@ -1,0 +1,4 @@
+id=fisherglobe_a54
+name=A54 donor safety and A52s identity
+author=Fisherglobe
+description=Fail-closed donor checks, flat-phone feature overrides and experiment identity. Does not transplant Exynos vendor/kernel hardware support.

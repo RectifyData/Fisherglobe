@@ -48,6 +48,11 @@ jobs:
           json.dump(c, open(p, 'w'), indent=2)
           PY
           python3 scripts/firmware.py resolve --config config/runtime.json --output reports/firmware-plan.json
+          python3 - <<'PY'
+          import json
+          p = json.load(open('reports/firmware-plan.json'))
+          print('::notice title=Resolved firmware::A54=' + p['donor_version'] + '; A52s base=' + p['target_version'])
+          PY
       - name: Publish a small, identifier-free firmware plan
         run: |
           {
