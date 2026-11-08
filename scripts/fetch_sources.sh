@@ -7,6 +7,9 @@ mkdir -p "$WORK"
 python3 "$ROOT/scripts/pins.py" checkout --work "$WORK" --name engine --sparse
 # Fetch the exact gitlink revisions, not the current tips of their default branches.
 python3 "$ROOT/scripts/pins.py" submodules --engine "$WORK/engine"
+if [[ "${FISHERGLOBE_SKIP_AOSP:-0}" != 1 ]]; then
+  python3 "$ROOT/scripts/pins.py" nested --engine "$WORK/engine"
+fi
 python3 "$ROOT/scripts/pins.py" checkout --work "$WORK" --name guide
 python3 "$ROOT/scripts/pins.py" checkout --work "$WORK" --name samloader
 printf 'Pinned engine: '; git -C "$WORK/engine" rev-parse HEAD

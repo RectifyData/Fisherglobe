@@ -56,7 +56,7 @@ def checkout(work, name, entry, sparse=False):
 def main():
     lock = json.loads((ROOT / "config/locks.json").read_text())
     ap = argparse.ArgumentParser()
-    ap.add_argument("command", choices=["checkout", "submodules", "actions"])
+    ap.add_argument("command", choices=["checkout", "submodules", "nested", "actions"])
     ap.add_argument("--work", type=pathlib.Path)
     ap.add_argument("--name")
     ap.add_argument("--sparse", action="store_true")
@@ -70,7 +70,21 @@ def main():
             if actual != entry["commit"]:
                 raise RuntimeError(f"Engine gitlink changed: {path}")
             checkout(a.engine / "external", path.removeprefix("external/"), entry)
-            # android-tools vendors its dependencies; other pinned projects have no submodules.
+    elif a.command == "nested":
+        tools = a.engine / "external/android-tools"
+        # These gitlinks point to AOSP Gitiles, not GitHub. The GitHub release
+        # tarball is not interchangeable with UN1CA's patched gitlink tree.
+        # CI has normal upstream access; this sandbox restricts outbound hosts.
+        git("submodule", "update", "--init", "--recursive", "--depth=1", cwd=tools)
+        expected = subprocess.check_output(
+            ["git", "ls-tree", "-r", "HEAD", "vendor"], cwd=tools, text=True)
+        for line in expected.splitlines():
+            meta, path = line.split("\t")
+            mode, kind, commit = meta.split()
+            if kind == "commit":
+                actual = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=tools / path, text=True).strip()
+                if actual != commit:
+                    raise RuntimeError(f"Nested gitlink mismatch: {path}")
     else:
         for key, sha in lock["actions"].items():
             if not SHA.fullmatch(sha):
