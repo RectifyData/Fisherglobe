@@ -179,8 +179,10 @@ def prepare(engine, donor_root, target_root, config, report_dir):
     if int(target_vendor["ro.build.version.sdk"]) != tp["platform_sdk"]:
         raise RuntimeError("Target base is not the pinned Android 14 stack")
     generated, info = source_config(donor_root, dp["model"], dp["region"])
-    # Target remains qssi. The source SSI is recorded separately in the generated config.
+    # The target remains qssi, so gen_config_file.sh reads qssi.sh even when
+    # the donor SSI is essi. Keep the inspected source SSI in that profile.
     (engine / "unica/configs/qssi.sh").write_text(generated)
+    (engine / "unica/configs/essi.sh").write_text(generated)
     # Use a Fisherglobe identity, public test keys, and no implicit official OTA identity.
     version = engine / "unica/configs/version.sh"
     version.write_text('VERSION_MAJOR=0\nVERSION_MINOR=1\nVERSION_PATCH=0\nROM_VERSION="0.1.0-fisherglobe"\n')
