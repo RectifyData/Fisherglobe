@@ -1,0 +1,28 @@
+{
+  "project": "Fisherglobe",
+  "target": {
+    "codename": "a52sxq",
+    "model": "SM-A528B",
+    "region": "BTU",
+    "firmware": "A528BXXU5FWK4/A528BOXM5FWK6/A528BXXU5FWK4",
+    "platform_sdk": 34,
+    "board_api": 30,
+    "fus_tac": "35259950"
+  },
+  "donor": {
+    "codename": "a54x",
+    "model": "SM-A546B",
+    "region": "EUX",
+    "minimum_sdk": 37,
+    "maximum_supported_sdk": 37,
+    "fus_tac": "35075648"
+  },
+  "filesystem": "erofs",
+  "status": "experimental-unverified-on-hardware",
+  "notes": [
+    "Latest applies to the A54 donor, not the A52s hardware base.",
+    "The pinned A52s Android 14 base is a compatibility requirement, not an anti-rollback downgrade.",
+    "TAC values are public model prefixes published in UN1CA, not a user's device identifier.",
+    "A successful package build is not a boot or hardware-validation result."
+  ]
+}

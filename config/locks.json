@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "sources": {
+    "engine": {
+      "repository": "https://github.com/kusti420/k4_un1ca.git",
+      "commit": "bf0d0240887c28517e08304fcf1d2bb536014f16"
+    },
+    "guide": {
+      "repository": "https://github.com/rajdeep-3305/android-porting-guide.git",
+      "commit": "782d10a34698ac656913fb0dd801aeb3688b5b59"
+    },
+    "samloader": {
+      "repository": "https://github.com/ananjaser1211/samloader.git",
+      "commit": "3c372007945d4f3f165433a1d5ae40523d7f68bf"
+    }
+  },
+  "engine_submodules": {
+    "external/android-tools": {
+      "repository": "https://github.com/UN1CA/external_android-tools.git",
+      "commit": "f9bef94306f93be88b0cf98f9eeb0e24fc7b6aa8"
+    },
+    "external/apktool": {
+      "repository": "https://github.com/iBotPeaches/Apktool.git",
+      "commit": "c0886b270e3735cb63ff96b5cef6641cc4adcac1"
+    },
+    "external/erofs-utils": {
+      "repository": "https://github.com/sekaiacg/erofs-utils.git",
+      "commit": "620bf019a3eb6a9a2d8fa807a3034e5cc2b38d8a"
+    },
+    "external/img2sdat": {
+      "repository": "https://github.com/UN1CA/external_img2sdat.git",
+      "commit": "fc05bbf92bc0218d86145e85145a3fbdcbad0ce6"
+    },
+    "external/samloader": {
+      "repository": "https://github.com/ananjaser1211/samloader.git",
+      "commit": "3c372007945d4f3f165433a1d5ae40523d7f68bf"
+    },
+    "external/signapk": {
+      "repository": "https://github.com/UN1CA/external_signapk.git",
+      "commit": "84abae42718dce00a6268b794fd1fe1c80ba76da"
+    }
+  },
+  "actions": {
+    "actions/checkout@v4": "11d5960a326750d5838078e36cf38b85af677262",
+    "actions/setup-java@v4": "cf277c60eb25467037889841efdb72551f06f6c3",
+    "actions/setup-python@v5": "a26af69be951a213d495a4c3e4e4022e16d87065",
+    "actions/upload-artifact@v4": "ea165f8d65b6e75b540449e92b4886f43607fa02",
+    "actions/download-artifact@v4": "d3f86a106a0bac45b974a628896c90dbdf5c8093",
+    "actions/cache@v4": "0057852bfaa89a56745cba8c7296529d2fc39830"
+  }
+}

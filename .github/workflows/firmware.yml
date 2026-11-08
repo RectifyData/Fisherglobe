@@ -1,0 +1,59 @@
+name: Discover A54 firmware
+
+on:
+  workflow_dispatch:
+    inputs:
+      donor_model:
+        description: International A54 model (never a carrier-locked U/U1/W)
+        type: choice
+        options: [SM-A546B, SM-A546E]
+        default: SM-A546B
+      donor_region:
+        description: Donor CSC
+        type: string
+        default: EUX
+  schedule:
+    - cron: '17 6 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: firmware-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  resolve:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Resolve current donor and record the compatible target base
+        env:
+          DONOR_MODEL: ${{ inputs.donor_model || 'SM-A546B' }}
+          DONOR_REGION: ${{ inputs.donor_region || 'EUX' }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          p = 'config/runtime.json'
+          c = json.load(open('config/port.json'))
+          c['donor']['model'] = os.environ['DONOR_MODEL']
+          c['donor']['region'] = os.environ['DONOR_REGION']
+          json.dump(c, open(p, 'w'), indent=2)
+          PY
+          python3 scripts/firmware.py resolve --config config/runtime.json --output reports/firmware-plan.json
+      - name: Publish a small, identifier-free firmware plan
+        run: |
+          {
+            echo '## Firmware plan'
+            echo 'The donor follows Samsung FUS; the A52s Android 14 base stays pinned.'
+            echo 'This is discovery only, not a ROM build or a boot test.'
+            echo '```json'
+            cat reports/firmware-plan.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: firmware-plan-${{ github.run_id }}
+          path: reports/firmware-plan.json
+          retention-days: 14

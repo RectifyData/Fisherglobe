@@ -1,0 +1,13 @@
+.work/
+out/
+reports/
+*.img
+*.img.lz4
+*.tar.md5
+*.zip
+!tests/fixtures/*.zip
+__pycache__/
+.pytest_cache/
+.venv/
+*.log
+*.pk8.tmp
