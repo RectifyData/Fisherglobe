@@ -1,6 +1,12 @@
 name: Discover A54 firmware
 
 on:
+  push:
+    branches: [arena/dfcc4d72-fisherglobe]
+    paths:
+      - '.github/workflows/firmware.yml'
+      - 'config/port.json'
+      - 'scripts/firmware.py'
   workflow_dispatch:
     inputs:
       donor_model:
