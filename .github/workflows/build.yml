@@ -83,14 +83,17 @@ jobs:
           restore-keys: gradle-${{ runner.os }}-
       - name: Install filesystem and Android image build dependencies
         run: |
-          sudo apt-get update
+          set -o pipefail
+          mkdir -p reports
+          sudo apt-get update 2>&1 | tee reports/apt.log
           sudo apt-get install -y --no-install-recommends \
             attr bc brotli ccache clang cmake curl e2fsprogs erofs-utils ffmpeg \
             fuse3 git git-lfs jq libbrotli-dev libbz2-dev libgtest-dev libpcre2-dev \
             libprotobuf-dev libunwind-dev libzstd-dev lld lz4 make p7zip-full \
             perl protobuf-compiler python3-venv rsync shellcheck unzip webp xxd zip zstd \
-            linux-modules-extra-$(uname -r)
-          sudo modprobe erofs
+            2>&1 | tee -a reports/apt.log
+          # Extraction uses fuse.erofs/fuse2fs; a host erofs kernel module is not required.
+          test -c /dev/fuse
           git config --global user.name 'github-actions[bot]'
           git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
       - name: Resolve, download, extract and port
@@ -106,18 +109,9 @@ jobs:
         run: |
           python3 - <<'PY'
           import pathlib
-          p = pathlib.Path('reports/pipeline.log')
-          text = p.read_text(errors='replace')[-5000:] if p.exists() else 'Pipeline failed before its log was created; inspect the failed step.'
-          text = text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
-          print('::error title=Port pipeline failure::' + text)
-          PY
-      - name: Surface pipeline failure in the check annotations
-        if: failure()
-        run: |
-          python3 - <<'PY'
-          import pathlib
-          p = pathlib.Path('reports/pipeline.log')
-          text = p.read_text(errors='replace')[-5000:] if p.exists() else 'Pipeline failed before its log was created; inspect the failed step.'
+          logs = [pathlib.Path('reports/pipeline.log'), pathlib.Path('reports/apt.log')]
+          text = '\n'.join(p.name + ':\n' + p.read_text(errors='replace')[-3000:] for p in logs if p.exists())
+          text = text or 'Pipeline failed before a diagnostic log was created; inspect the failed step.'
           text = text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
           print('::error title=Port pipeline failure::' + text)
           PY
